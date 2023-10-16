@@ -7,7 +7,8 @@ export const useFollowCam = function (props: UseFollowCamProps) {
   const { scene, camera } = useThree();
   // const { rapier, world } = useRapier();
 
-  let originZDis = props.camInitDis;
+  // let originZDis = props.camInitDis;
+  let originZDis = props.camDis;
   const camMaxDis = props.camMaxDis;
   const camMinDis = props.camMinDis;
   const camCollisionOff = 0.7;
@@ -159,4 +160,5 @@ export type UseFollowCamProps = {
   camInitDis: number;
   camMaxDis: number;
   camMinDis: number;
+  camDis: number;
 };

@@ -31,6 +31,7 @@ export default function Ecctrl({
   camInitDis = -5,
   camMaxDis = -7,
   camMinDis = -0.7,
+  camDis = -5,
   // Base control setups
   maxVelLimit = 2.5,
   turnVelMultiplier = 0.2,
@@ -188,6 +189,12 @@ export default function Ecctrl({
           max: 15,
           step: 0.1,
         },
+        camDis: {
+          value: camInitDis,
+          min: camMaxDis,
+          max: camMinDis,
+          steps: 0.1,
+        },
       },
       { collapsed: true }
     );
@@ -206,6 +213,7 @@ export default function Ecctrl({
     rejectVelMult = characterControlsDebug.rejectVelMult;
     moveImpulsePointY = characterControlsDebug.moveImpulsePointY;
     camFollowMult = characterControlsDebug.camFollowMult;
+    camDis = characterControlsDebug.camDis;
 
     // Floating Ray
     floatingRayDebug = useControls(
@@ -268,7 +276,7 @@ export default function Ecctrl({
           value: slopeMaxAngle,
           min: 0,
           max: 1.57,
-          step: 0.01
+          step: 0.01,
         },
         slopeRayOriginOffest: {
           value: capsuleRadius,
@@ -374,6 +382,7 @@ export default function Ecctrl({
     camInitDis,
     camMaxDis,
     camMinDis,
+    camDis,
   };
 
   /**
@@ -484,18 +493,18 @@ export default function Ecctrl({
           movingObjectVelocityInCharacterDir.x) -
         (currentVel.x -
           movingObjectVelocity.x *
-          Math.sin(angleBetweenCharacterDirAndObjectDir) +
+            Math.sin(angleBetweenCharacterDirAndObjectDir) +
           rejectVel.x * (isOnMovingObject ? 0 : rejectVelMult))) /
-      accDeltaTime,
+        accDeltaTime,
       0,
       (movingDirection.z *
         (maxVelLimit * (run ? sprintMult : 1) +
           movingObjectVelocityInCharacterDir.z) -
         (currentVel.z -
           movingObjectVelocity.z *
-          Math.sin(angleBetweenCharacterDirAndObjectDir) +
+            Math.sin(angleBetweenCharacterDirAndObjectDir) +
           rejectVel.z * (isOnMovingObject ? 0 : rejectVelMult))) /
-      accDeltaTime
+        accDeltaTime
     );
 
     // Wanted to move force function: F = ma
@@ -514,19 +523,19 @@ export default function Ecctrl({
     if (!characterRotated) {
       moveImpulse.set(
         moveForceNeeded.x *
-        turnVelMultiplier *
-        (canJump ? 1 : airDragMultiplier), // if it's in the air, give it less control
+          turnVelMultiplier *
+          (canJump ? 1 : airDragMultiplier), // if it's in the air, give it less control
         slopeAngle === null || slopeAngle == 0 // if it's on a slope, apply extra up/down force to the body
           ? 0
           : movingDirection.y *
-          turnVelMultiplier *
-          (movingDirection.y > 0 // check it is on slope up or slope down
-            ? slopeUpExtraForce
-            : slopeDownExtraForce) *
-          (run ? sprintMult : 1),
+              turnVelMultiplier *
+              (movingDirection.y > 0 // check it is on slope up or slope down
+                ? slopeUpExtraForce
+                : slopeDownExtraForce) *
+              (run ? sprintMult : 1),
         moveForceNeeded.z *
-        turnVelMultiplier *
-        (canJump ? 1 : airDragMultiplier) // if it's in the air, give it less control
+          turnVelMultiplier *
+          (canJump ? 1 : airDragMultiplier) // if it's in the air, give it less control
       );
     }
     // If character complete turning, change the impulse quaternion default
@@ -536,10 +545,10 @@ export default function Ecctrl({
         slopeAngle === null || slopeAngle == 0 // if it's on a slope, apply extra up/down force to the body
           ? 0
           : movingDirection.y *
-          (movingDirection.y > 0 // check it is on slope up or slope down
-            ? slopeUpExtraForce
-            : slopeDownExtraForce) *
-          (run ? sprintMult : 1),
+              (movingDirection.y > 0 // check it is on slope up or slope down
+                ? slopeUpExtraForce
+                : slopeDownExtraForce) *
+              (run ? sprintMult : 1),
         moveForceNeeded.z * (canJump ? 1 : airDragMultiplier)
       );
     }
@@ -562,11 +571,11 @@ export default function Ecctrl({
   const autoBalanceCharacter = () => {
     dragAngForce.set(
       -autoBalanceSpringK * characterRef.current.rotation().x -
-      characterRef.current.angvel().x * autoBalanceDampingC,
+        characterRef.current.angvel().x * autoBalanceDampingC,
       -autoBalanceSpringK * characterRef.current.rotation().y -
-      characterRef.current.angvel().y * autoBalanceDampingOnY,
+        characterRef.current.angvel().y * autoBalanceDampingOnY,
       -autoBalanceSpringK * characterRef.current.rotation().z -
-      characterRef.current.angvel().z * autoBalanceDampingC
+        characterRef.current.angvel().z * autoBalanceDampingC
     );
     characterRef.current.applyTorqueImpulse(dragAngForce, false);
   };
@@ -752,7 +761,7 @@ export default function Ecctrl({
       characterRef.current as unknown as Collider,
       null,
       // this exclude with sensor collider
-      ((collider) => !collider.isSensor())
+      (collider) => !collider.isSensor()
     );
     /**Test shape ray */
     // rayHit = world.castShape(
@@ -811,16 +820,16 @@ export default function Ecctrl({
           // Combine object linear velocity and angular velocity to movingObjectVelocity
           movingObjectVelocity.set(
             movingObjectLinvel.x +
-            objectAngvelToLinvel.crossVectors(
-              movingObjectAngvel,
-              distanceFromCharacterToObject
-            ).x,
+              objectAngvelToLinvel.crossVectors(
+                movingObjectAngvel,
+                distanceFromCharacterToObject
+              ).x,
             movingObjectLinvel.y,
             movingObjectLinvel.z +
-            objectAngvelToLinvel.crossVectors(
-              movingObjectAngvel,
-              distanceFromCharacterToObject
-            ).z
+              objectAngvelToLinvel.crossVectors(
+                movingObjectAngvel,
+                distanceFromCharacterToObject
+              ).z
           );
 
           // Apply opposite drage force to the stading rigid body, body type 0
@@ -865,7 +874,7 @@ export default function Ecctrl({
       characterRef.current as unknown as Collider,
       null,
       // this exclude with sensor collider
-      ((collider) => !collider.isSensor())
+      (collider) => !collider.isSensor()
     );
 
     // Calculate slope angle
@@ -1023,6 +1032,7 @@ export interface EcctrlProps extends RigidBodyProps {
   followLight?: boolean;
   // Follow camera setups
   camInitDis?: number;
+  camDis?: number;
   camMaxDis?: number;
   camMinDis?: number;
   // Base control setups
@@ -1065,4 +1075,4 @@ export interface EcctrlProps extends RigidBodyProps {
   animated?: boolean;
   // Other rigibody props from parent
   props?: RigidBodyProps;
-};
+}

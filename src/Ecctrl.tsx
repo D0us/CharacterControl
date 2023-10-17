@@ -648,6 +648,8 @@ export default function Ecctrl({
     );
   }, [autoBalance]);
 
+  const cameraPivotSpeed = 10 * 0.002;
+
   useFrame((state, delta) => {
     // Character current position
     if (characterRef.current) {
@@ -669,36 +671,25 @@ export default function Ecctrl({
      */
     const { forward, backward, leftward, rightward, jump, run } = getKeys();
 
-    // Getting moving directions
-    if (forward) {
-      // Apply camera rotation to character model
+    if (!backward && (forward || leftward || rightward)) {
+      if (leftward) {
+        pivot.rotation.y += cameraPivotSpeed;
+      } else if (rightward) {
+        pivot.rotation.y -= cameraPivotSpeed;
+      }
       modelEuler.y = pivot.rotation.y;
-    } else if (backward) {
-      // Apply camera rotation to character model
-      modelEuler.y = pivot.rotation.y + Math.PI;
-    } else if (leftward) {
-      // Apply camera rotation to character model
-      modelEuler.y = pivot.rotation.y + Math.PI / 2;
-    } else if (rightward) {
-      // Apply camera rotation to character model
-      modelEuler.y = pivot.rotation.y - Math.PI / 2;
-    }
-    if (forward && leftward) {
-      // Apply camera rotation to character model
-      modelEuler.y = pivot.rotation.y + Math.PI / 4;
-    } else if (forward && rightward) {
-      // Apply camera rotation to character model
-      modelEuler.y = pivot.rotation.y - Math.PI / 4;
     } else if (backward && leftward) {
       // Apply camera rotation to character model
       modelEuler.y = pivot.rotation.y - Math.PI / 4 + Math.PI;
     } else if (backward && rightward) {
       // Apply camera rotation to character model
       modelEuler.y = pivot.rotation.y + Math.PI / 4 + Math.PI;
+    } else if (backward) {
+      modelEuler.y = pivot.rotation.y + Math.PI;
     }
 
     // Move character to the moving direction
-    if (forward || backward || leftward || rightward)
+    if (forward || backward)
       moveCharacter(delta, run, slopeAngle, movingObjectVelocity);
 
     // Character current velocity

@@ -145,11 +145,11 @@ export const useFollowCam = function (props: UseFollowCamProps) {
     followCam.add(camera);
     pivot.add(followCam);
 
-    document.addEventListener("mousemove", onDocumentMouseMove);
-    document.addEventListener("mousewheel", onDocumentMouseWheel);
+    // document.addEventListener("mousemove", onDocumentMouseMove);
+    // document.addEventListener("mousewheel", onDocumentMouseWheel);
     return () => {
-      document.removeEventListener("mousemove", onDocumentMouseMove);
-      document.removeEventListener("mousewheel", onDocumentMouseWheel);
+      // document.removeEventListener("mousemove", onDocumentMouseMove);
+      // document.removeEventListener("mousewheel", onDocumentMouseWheel);
     };
   });
 
